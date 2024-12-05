@@ -43,6 +43,12 @@ void fill_square(int lin, int col, vector<vector<vector<int>>>& tabela,
                     tabela[col][lin][res + 2 * n] = j;
                     return; // Para assim que encontrar
                 }
+
+                // Se já encontrou todos os resultados possíveis, para os loops
+                if (full >= n) {
+                    found = true;
+                    break;
+                }
             }
         }
     }
