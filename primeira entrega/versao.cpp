@@ -108,6 +108,8 @@ int main() {
     int target;
     if (scanf("%d", &target) != 1) return 1;
 
+
+
     // Caso especial: sequencia com apenas um valor
     if (m == 1) {
         if (sequence[0] == target) {
@@ -126,10 +128,17 @@ int main() {
     }
 
     // Preenche a tabela para todos os subintervalos
-    for (int len = 2; len <= m; ++len) {
+    bool solution_found = false; // Flag para saber se a solução foi encontrada
+    for (int len = 2; len <= m && !solution_found; ++len) {
         for (int lin = 0; lin <= m - len; ++lin) {
             int col = lin + len - 1;
             fill_square(lin, col, tabela, matriz, target - 1, n, 0, 1);
+
+            // Verifica se o valor-alvo foi encontrado
+            if (tabela[0][m - 1][target - 1] != -1) {
+                solution_found = true;
+                break; // Para o loop se a solução foi encontrada
+            }
         }
     }
 
