@@ -3,8 +3,10 @@
 #include <cstdio>
 #include <algorithm>
 #include <limits>
+#include <chrono> // Adicionado para medir o tempo de execução
 
 using namespace std;
+using namespace chrono; // Para facilitar o uso de funções de tempo
 
 // Preencher a matriz com resultados
 void fill_tabela(int lin, int col, vector<vector<vector<int>>>& tabela,
@@ -91,6 +93,7 @@ void reconstruct(int lin, int col, int v, const vector<vector<vector<int>>>& tab
 
 
 int main() {
+ 
     int n, m;
     if (scanf("%d %d", &n, &m) != 2) return 1;
 
@@ -109,8 +112,6 @@ int main() {
     int target;
     if (scanf("%d", &target) != 1) return 1;
 
-
-
     // Caso especial de sequencia com tamanho 1
     if (m == 1) {
         if (sequence[0] == target) {
@@ -121,11 +122,10 @@ int main() {
         return 0;
     }
 
-
-    // inicia a tabela
+    // Inicia a tabela
     vector<vector<vector<int>>> tabela(m, vector<vector<int>>(m, vector<int>(n * 3, -1)));
     for (int i = 0; i < m; ++i) {
-        tabela[i][i][0] = sequence[i] - 1; // Ajusta indice 
+        tabela[i][i][0] = sequence[i] - 1; // Ajusta indice
     }
 
     // Preenche a tabela para todos os subintervalos
@@ -143,7 +143,7 @@ int main() {
         }
     }
 
-    // construir solucao
+    // Construir a solução
     string result;
     if (tabela[0][m - 1][target - 1] == -1) {
         printf("0\n");
@@ -155,5 +155,6 @@ int main() {
             printf("1\n%s\n", result.c_str());
         }
     }
+
     return 0;
 }
