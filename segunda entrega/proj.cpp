@@ -14,7 +14,8 @@ struct Edge {
 int bfs(const vector<vector<Edge>> &graph, int start, int end, int n) {
     queue<tuple<int, int, int>> q; // {estação atual, linha atual, contador de mudanças}
     set<pair<int, int>> visited; // Conjunto de estações e linhas visitadas (estação, linha)
-    
+    vector<int> changes_vector; // Vetor para armazenar todas as mudanças
+
     q.push(make_tuple(start, -1, -1)); // Começamos sem uma linha definida e sem mudanças (mudanças = -1, pois não conta a primeira estação)
     visited.insert(make_pair(start, -1)); // Marcamos a estação inicial sem linha como visitada
 
@@ -26,9 +27,10 @@ int bfs(const vector<vector<Edge>> &graph, int start, int end, int n) {
         int current_line = get<1>(current); // Linha atual
         int changes = get<2>(current);     // Número de mudanças até agora
 
-        // Se chegarmos à estação de destino, retornamos o número de mudanças
+        // Se chegarmos à estação de destino, adicionamos o número de mudanças ao vetor
         if (station == end) {
-            return changes;
+            changes_vector.push_back(changes);
+            continue;
         }
 
         // Explorar todas as conexões da estação atual
@@ -45,7 +47,12 @@ int bfs(const vector<vector<Edge>> &graph, int start, int end, int n) {
         }
     }
 
-    return -1; // Não há caminho entre start e end
+    // Retorna o menor valor de mudanças ou -1 se o vetor estiver vazio
+    if (changes_vector.empty()) {
+        return -1;
+    } else {
+        return *min_element(changes_vector.begin(), changes_vector.end());
+    }
 }
 
 int metro_connectivity(const vector<vector<Edge>> &graph) {
