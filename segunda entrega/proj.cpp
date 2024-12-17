@@ -13,11 +13,11 @@ struct Edge {
 
 int bfs(const vector<vector<Edge>> &graph, int start, int end, int n) {
     queue<tuple<int, int, int>> q; // {estação atual, linha atual, contador de mudanças}
-    set<pair<int, int>> visited; // Conjunto de estações e linhas visitadas (estação, linha)
+    set<int> visited; // Conjunto de estações visitadas
     vector<int> changes_vector; // Vetor para armazenar todas as mudanças
 
     q.push(make_tuple(start, -1, -1)); // Começamos sem uma linha definida e sem mudanças (mudanças = -1, pois não conta a primeira estação)
-    visited.insert(make_pair(start, -1)); // Marcamos a estação inicial sem linha como visitada
+    visited.insert(start); // Marcamos a estação inicial como visitada
 
     while (!q.empty()) {
         tuple<int, int, int> current = q.front();
@@ -30,14 +30,13 @@ int bfs(const vector<vector<Edge>> &graph, int start, int end, int n) {
         // Se chegarmos à estação de destino, adicionamos o número de mudanças ao vetor
         if (station == end) {
             changes_vector.push_back(changes);
-            continue;
         }
 
         // Explorar todas as conexões da estação atual
         for (const Edge& edge : graph[station]) {
-            // Se a estação e a linha ainda não foram visitadas
-            if (visited.find(make_pair(edge.to, edge.line)) == visited.end()) {
-                visited.insert(make_pair(edge.to, edge.line));
+            // Se a estação ainda não foi visitada
+            if (visited.find(edge.to) == visited.end()) {
+                visited.insert(edge.to);
                 if (current_line == edge.line) {
                     q.push(make_tuple(edge.to, current_line, changes)); // Continua na mesma linha
                 } else {
