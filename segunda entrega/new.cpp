@@ -118,7 +118,7 @@ int main() {
     int first_line = -1;
     for (int i = 0; i < n; ++i) {
         for (auto conn : graph[i]) {
-            if (first_line == -1) {
+            if (first_line == -1) { 
                 first_line = conn.second;
             } else if (conn.second != first_line) {
                 all_same_line = false;
