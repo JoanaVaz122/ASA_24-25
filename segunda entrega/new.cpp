@@ -66,6 +66,12 @@ int main() {
         graph[y].push_back({x, line});
     }
 
+    // Caso haja somente uma estação
+    if (n == 1) {
+        printf("0\n");
+        return 0;
+    }
+
     // Verificar conectividade do grafo
     vector<int> visited(n, 0);
     queue<int> q;
@@ -89,6 +95,26 @@ int main() {
 
     if (count != n) {
         printf("-1\n");
+        return 0;
+    }
+
+    // Verificar se todas as estações estão na mesma linha
+    bool same_line = true;
+    for (int i = 0; i < n; ++i) {
+        int line = -1;
+        for (auto conn : graph[i]) {
+            if (line == -1) {
+                line = conn.second;
+            } else if (line != conn.second) {
+                same_line = false;
+                break;
+            }
+        }
+        if (!same_line) break;
+    }
+
+    if (same_line) {
+        printf("0\n");
         return 0;
     }
 
