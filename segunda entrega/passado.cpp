@@ -2,16 +2,96 @@
 #include <vector>
 #include <queue>
 #include <climits>
-#include <set>
+#include <unordered_set>
 #include <algorithm>
+#include <iostream> // Para usar cout
 
 using namespace std;
 
-// BFS para verificar conectividade de todo o grafo
-bool is_graph_connected(const vector<vector<pair<int, int>>>& graph, int n) {
+// Função para calcular o número mínimo de trocas de linha entre as estações
+int bfs(const vector<vector<pair<int, int>>>& graph, int n, int l) {
+    
+    vector<vector<int>> dist(n, vector<int>(l + 1, INT_MAX));
+    queue<pair<int, int>> q; // Fila: {estação, linha atual}
+
+    // Inicializar BFS a partir da estação inicial (0)
+    for (auto conn : graph[0]) {
+        int next_station = conn.first;
+        int next_line = conn.second;
+        dist[next_station][next_line] = 0; // Sem trocas inicialmente
+        q.push({next_station, next_line});
+    }
+
+    while (!q.empty()) {
+        int station = q.front().first;
+        int line = q.front().second;
+        q.pop();
+
+        for (auto conn : graph[station]) {
+            int next_station = conn.first;
+            int next_line = conn.second;
+
+            // Somente considere trocas de linha
+            int cost = dist[station][line] + (line != next_line);
+
+            if (cost < dist[next_station][next_line]) {
+                dist[next_station][next_line] = cost;
+                q.push({next_station, next_line});
+            }
+        }
+    }
+
+    // Encontrar o custo máximo entre todas as estações
+    int max_changes = 0;
+    for (int station = 0; station < n; ++station) {
+        int min_changes = INT_MAX;
+        for (int line = 1; line <= l; ++line) {
+            min_changes = min(min_changes, dist[station][line]);
+        }
+        if (min_changes == INT_MAX) {
+            printf("-1\n");
+            return 0;
+        }
+
+        max_changes = max(max_changes, min_changes);
+    }
+
+    return max_changes;
+}
+
+int main() {
+    int n, m, l;
+
+    if (scanf("%d %d %d", &n, &m, &l) != 3 || n < 2 || m < 0 || l < 0) {
+        printf("-1\n");
+        return 0;
+    }
+
+    vector<vector<pair<int, int>>> graph(n);
+    //unordered_set<int> unique_stations; // Conjunto de estações únicas mencionadas
+
+    // Ler as conexões
+    for (int i = 0; i < m; ++i) {
+        int x, y, line;
+        if (scanf("%d %d %d", &x, &y, &line) != 3 || x < 1 || y < 1 || x > n || y > n || line < 1 || line > l) {
+            printf("-1\n");
+            return 0;
+        }
+        --x; --y; // Convertido para índice baseado em 0
+        graph[x].push_back({y, line});
+        graph[y].push_back({x, line});
+
+    }
+
+    // Caso haja somente uma estação
+    if (n == 1) {
+        printf("0\n");
+        return 0;
+    }
+
+    // Verificar conectividade do grafo
     vector<int> visited(n, 0);
     queue<int> q;
-
     q.push(0);
     visited[0] = 1;
     int count = 1;
@@ -30,79 +110,34 @@ bool is_graph_connected(const vector<vector<pair<int, int>>>& graph, int n) {
         }
     }
 
-    return count == n;
-}
-
-// BFS para calcular mudanças mínimas entre estações
-int bfs(const vector<vector<pair<int, int>>>& graph, int start, int n, int l) {
-    queue<pair<int, int>> q;  // Fila: {estação, linha atual}
-    vector<vector<int>> dist(n, vector<int>(l + 1, INT_MAX));
-
-    // Inicializa BFS a partir da estação inicial
-    for (auto conn : graph[start]) {
-        int next_station = conn.first;
-        int next_line = conn.second;
-        q.push({next_station, next_line});
-        dist[next_station][next_line] = 0;
-    }
-
-    while (!q.empty()) {
-        int station = q.front().first;
-        int line = q.front().second;
-        q.pop();
-
-        for (auto conn : graph[station]) {
-            int next_station = conn.first;
-            int next_line = conn.second;
-            int cost = dist[station][line] + (line != next_line);
-
-            if (cost < dist[next_station][next_line]) {
-                dist[next_station][next_line] = cost;
-                q.push({next_station, next_line});
-            }
-        }
-    }
-
-    // Retorna a maior distância encontrada para esta estação
-    int max_changes = 0;
-    for (int line = 1; line <= l; ++line) {
-        max_changes = max(max_changes, *min_element(dist[line].begin(), dist[line].end()));
-    }
-    return max_changes;
-}
-
-int main() {
-    int n, m, l;
-    scanf("%d %d %d", &n, &m, &l);
-
-    vector<vector<pair<int, int>>> graph(n);
-
-    // Leitura das conexões
-    for (int i = 0; i < m; ++i) {
-        int x, y, line;
-        scanf("%d %d %d", &x, &y, &line);
-        --x; --y; // Ajusta índices para base 0
-        graph[x].push_back({y, line});
-        graph[y].push_back({x, line});
-    }
-
-    // Verifica se o grafo é conectado
-    if (!is_graph_connected(graph, n)) {
+    // Se alguma estação não estiver conectada, retornar -1
+    if (count != n || m == 0) {
         printf("-1\n");
         return 0;
     }
 
-    // Caso particular: verifica se todas as estações estão em uma única linha
-    if (m == n - 1) {
+    // Verificar se todas as estações estão na mesma linha
+    bool same_line = true;
+    for (int i = 0; i < n; ++i) {
+        int line = -1;
+        for (auto conn : graph[i]) {
+            if (line == -1) {
+                line = conn.second;
+            } else if (line != conn.second) {
+                same_line = false;
+                break;
+            }
+        }
+        if (!same_line) break;
+    }
+
+    if (same_line) {
         printf("0\n");
         return 0;
     }
 
-    // Calcula conectividade máxima entre todas as estações
-    int max_changes = 0;
-    for (int i = 0; i < n; ++i) {
-        max_changes = max(max_changes, bfs(graph, i, n, l));
-    }
+    // Calcular o número máximo de trocas entre todas as estações
+    int max_changes = bfs(graph, n, l);
 
     printf("%d\n", max_changes);
     return 0;
