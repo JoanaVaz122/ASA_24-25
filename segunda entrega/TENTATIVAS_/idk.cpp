@@ -2,15 +2,13 @@
 #include <vector>
 #include <queue>
 #include <climits>
-#include <unordered_set>
+#include <unordered_map>
 #include <algorithm>
-#include <iostream> // Para usar cout
 
 using namespace std;
 
 // Função para calcular o número mínimo de trocas de linha entre as estações
-int bfs(const vector<vector<pair<int, int>>>& graph, int n, int l) {
-    
+int bfs(const vector<vector<pair<int, int>>>& graph, int n, int l) { 
     vector<vector<int>> dist(n, vector<int>(l + 1, INT_MAX));
     queue<pair<int, int>> q; // Fila: {estação, linha atual}
 
@@ -67,8 +65,11 @@ int main() {
         return 0;
     }
 
+    // Grafo onde cada conexão inclui a linha associada
     vector<vector<pair<int, int>>> graph(n);
-    //unordered_set<int> unique_stations; // Conjunto de estações únicas mencionadas
+
+    // Mapeamento das conexões entre linhas para cada estação
+    unordered_map<int, vector<pair<int, int>>> line_connections;
 
     // Ler as conexões
     for (int i = 0; i < m; ++i) {
@@ -81,6 +82,24 @@ int main() {
         graph[x].push_back({y, line});
         graph[y].push_back({x, line});
 
+        // Adicionar conexões de linha para permitir trocas
+        line_connections[x].push_back({y, line});
+        line_connections[y].push_back({x, line});
+    }
+
+    // Adicionar trocas de linha (conexões virtuais entre diferentes linhas na mesma estação)
+    for (int station = 0; station < n; ++station) {
+        auto& connections = line_connections[station];
+        for (size_t i = 0; i < connections.size(); ++i) {
+            for (size_t j = i + 1; j < connections.size(); ++j) {
+                int line1 = connections[i].second;
+                int line2 = connections[j].second;
+                if (line1 != line2) {
+                    graph[station].push_back({station, line2});
+                    graph[station].push_back({station, line1});
+                }
+            }
+        }
     }
 
     // Caso haja somente uma estação

@@ -45,6 +45,7 @@ int bfs(const vector<vector<pair<int, int>>>& graph, int n, int l) {
         for (int line = 1; line <= l; ++line) {
             min_changes = min(min_changes, dist[station][line]);
         }
+        if (min_changes == INT_MAX) return -1; // Estação inatingível
         max_changes = max(max_changes, min_changes);
     }
 
@@ -53,14 +54,21 @@ int bfs(const vector<vector<pair<int, int>>>& graph, int n, int l) {
 
 int main() {
     int n, m, l;
-    scanf("%d %d %d", &n, &m, &l);
+    
+    if(scanf("%d %d %d", &n, &m, &l)!= 3 || n < 2 || m < 0 || l<0){
+        printf("-1\n");
+        return 0;
+    }
 
     vector<vector<pair<int, int>>> graph(n);
 
     // Ler as conexões
     for (int i = 0; i < m; ++i) {
         int x, y, line;
-        scanf("%d %d %d", &x, &y, &line);
+        if (scanf("%d %d %d", &x, &y, &line) != 3 || x < 1 || y < 1 || x > n || y > n || line < 1 || line > l) {
+            printf("-1\n");
+            return 0;
+        }
         --x; --y; // Convertido para índice baseado em 0
         graph[x].push_back({y, line});
         graph[y].push_back({x, line});
@@ -72,7 +80,15 @@ int main() {
         return 0;
     }
 
-    // Verificar conectividade do grafo
+    // Verificar se existe alguma estação sem conexões
+    for (int i = 0; i < n; ++i) {
+        if (graph[i].empty()) {
+            printf("-1\n");
+            return 0;
+        }
+    }
+
+    // Verificar se existe alguma estação desconectada
     vector<int> visited(n, 0);
     queue<int> q;
     q.push(0);
@@ -93,6 +109,7 @@ int main() {
         }
     }
 
+    // Se alguma estação não estiver conectada, retornar -1
     if (count != n) {
         printf("-1\n");
         return 0;
