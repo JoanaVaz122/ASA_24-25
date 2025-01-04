@@ -3,7 +3,7 @@ import sys
 
 def maximize_toy_distribution(num_factories, num_countries, num_children, factories, countries, requests):
     # Create the linear programming problem
-    model = LpProblem(name="Maximize_Toy_Distribution", sense=LpMaximize)
+    model = LpProblem(name="Maximize_Toy_Distribution", sense=LpMaximize) 
 
     # Define variables
     child_vars = {k: LpVariable(name=f"child_{k}", cat="Binary") for k in range(1, num_children + 1)}
