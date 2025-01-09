@@ -3,13 +3,13 @@ import pulp
 
 def main():
     input = sys.stdin
-    n, m, t = map(int, input.readline().strip().split())
+    n, m, t = map(int, input.readline().strip().split())  
     
     factories = [list(map(int, input.readline().strip().split())) for _ in range(n)]
     countries = [list(map(int, input.readline().strip().split())) for _ in range(m)]
     requests = [list(map(int, input.readline().strip().split())) for _ in range(t)]
     
-    # Create the LP problem
+    # Create the LP problem  
     prob = pulp.LpProblem("Maximize_Children_Satisfaction", pulp.LpMaximize)
     
     # Create variables
